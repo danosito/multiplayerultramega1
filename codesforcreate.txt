@@ -1,0 +1,11 @@
+b-bricks
+w-water
+d-dirt
+g-grass
+s-stone
+i-ice
+k-key
+l-lockwithkey(2 текстурки)
+t-torch
+c-chain(цепь)
+a-air
