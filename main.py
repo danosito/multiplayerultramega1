@@ -2,7 +2,7 @@ import os
 import sys
 import random
 import pygame
-
+#ыва
 pygame.init()
 size = width, height = 1920, 1080
 screen = pygame.display.set_mode(size)
