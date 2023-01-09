@@ -356,6 +356,31 @@ class Camera:
 running = True
 player2 = None
 level1 = load_level("map1.txt")
+menu_sprites = pygame.sprite.Group()
+strelka1 = pygame.sprite.Sprite()
+strelka1.image = load_image("gameover.png")
+strelka1.rect = strelka1.image.get_rect()
+menu_sprites.add(strelka1)
+strelka2 = pygame.sprite.Sprite()
+strelka2.image = load_image("gameover.png")
+strelka2.rect = strelka2.image.get_rect()
+menu_sprites.add(strelka2)
+strelka3 = pygame.sprite.Sprite()
+strelka3.image = load_image("gameover.png")
+strelka3.rect = strelka3.image.get_rect()
+menu_sprites.add(strelka3)
+strelka4 = pygame.sprite.Sprite()
+strelka4.image = load_image("gameover.png")
+strelka4.rect = strelka4.image.get_rect()
+menu_sprites.add(strelka4)
+strelka5 = pygame.sprite.Sprite()
+strelka5.image = load_image("gameover.png")
+strelka5.rect = strelka5.image.get_rect()
+menu_sprites.add(strelka5)
+strelka6 = pygame.sprite.Sprite()
+strelka6.image = load_image("gameover.png")
+strelka6.rect = strelka6.image.get_rect()
+menu_sprites.add(strelka6)
 player, level_x, level_y, player2 = generate_level(level1)
 camera = Camera()
 gameover_group = pygame.sprite.Group()
@@ -368,6 +393,7 @@ gameover.rect.x = -1920
 gameover.rect.y = 0
 clock1 = pygame.time.Clock()
 state = 0
+nowlevelsel = 1
 # изображение должно лежать в папке data
 while running:
     if state == 1:
@@ -430,8 +456,9 @@ while running:
             clock1.tick(60)
             pygame.display.flip()
     if state == 0:
+        g = open("data/lastlevel.txt")
         screen.fill((128, 128, 128))
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
                 running = False
-        menu_sprites.draw(screen)
+        pygame.display.flip()
