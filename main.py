@@ -2,7 +2,7 @@ import os
 import sys
 import random
 import pygame
-#ыва
+
 pygame.init()
 size = width, height = 1920, 1080
 screen = pygame.display.set_mode(size)
@@ -359,6 +359,7 @@ level1 = load_level("map1.txt")
 player, level_x, level_y, player2 = generate_level(level1)
 camera = Camera()
 gameover_group = pygame.sprite.Group()
+menu_group = pygame.sprite.Group()
 gameover = pygame.sprite.Sprite()
 gameover.image = load_image("gameover.png")
 gameover.rect = gameover.image.get_rect()
@@ -366,63 +367,71 @@ gameover_group.add(gameover)
 gameover.rect.x = -1920
 gameover.rect.y = 0
 clock1 = pygame.time.Clock()
+state = 0
 # изображение должно лежать в папке data
 while running:
-    if not(isOvered):
-        screen.fill((0, 0, 0))
-        # изменяем ракурс камеры
+    if state == 1:
+        if not(isOvered):
+            screen.fill((0, 0, 0))
+            # изменяем ракурс камеры
+            for ev in pygame.event.get():
+                if ev.type == pygame.QUIT:
+                    running = False
+                if ev.type == pygame.KEYDOWN:
+                    if ev.key in [97, 100, 119, 115]:
+                        g = player.move(ev)
+                        if g != None:
+                            for j in all_sprites:
+                                j.kill()
+                            player, level_x, level_y, player2 = generate_level(g)
+                    else:
+                        g = player2.move(ev)
+                        if g != None:
+                            for j in all_sprites:
+                                j.kill()
+                            player, level_x, level_y, player2 = generate_level(g)
+                if ev.type == pygame.KEYUP:
+                    if ev.key in [97, 100, 119, 115]:
+                        player.stopmove(ev)
+                    else:
+                        player2.stopmove(ev)
+            isOvered1 = player.update()
+            isOvered2 = player2.update()
+            isOvered = isOvered1 or isOvered2
+            camera.update(player)
+            # обновляем положение всех спрайтов
+            for sprite in all_sprites:
+                camera.apply(sprite)
+            all_sprites.draw(screen)
+            player_group.draw(screen)
+            clock1.tick(60)
+            pygame.display.flip()
+        else:
+            for ev in pygame.event.get():
+                if ev.type == pygame.QUIT:
+                    running = False
+                if ev.type == pygame.MOUSEBUTTONDOWN:
+                    for sprite in all_sprites:
+                        sprite.kill()
+                    isOvered = False
+                    player, level_x, level_y, player2 = generate_level(level1)
+                    gameover.rect.x = -1200
+            if gameover.rect.x < 0:
+                gameover.rect.x += 600 / 60
+            screen.fill((0, 0, 0))
+            all_sprites.draw(screen)
+            for ev in pygame.event.get():
+                if ev.type == pygame.QUIT:
+                    running = False
+            player_group.draw(screen)
+            player.update(chg1=False, chg2=False)
+            player2.update(chg1=False, chg2=False)
+            gameover_group.draw(screen)
+            clock1.tick(60)
+            pygame.display.flip()
+    if state == 0:
+        screen.fill((128, 128, 128))
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
                 running = False
-            if ev.type == pygame.KEYDOWN:
-                if ev.key in [97, 100, 119, 115]:
-                    g = player.move(ev)
-                    if g != None:
-                        for j in all_sprites:
-                            j.kill()
-                        player, level_x, level_y, player2 = generate_level(g)
-                else:
-                    g = player2.move(ev)
-                    if g != None:
-                        for j in all_sprites:
-                            j.kill()
-                        player, level_x, level_y, player2 = generate_level(g)
-            if ev.type == pygame.KEYUP:
-                if ev.key in [97, 100, 119, 115]:
-                    player.stopmove(ev)
-                else:
-                    player2.stopmove(ev)
-        isOvered1 = player.update()
-        isOvered2 = player2.update()
-        isOvered = isOvered1 or isOvered2
-        camera.update(player)
-        # обновляем положение всех спрайтов
-        for sprite in all_sprites:
-            camera.apply(sprite)
-        all_sprites.draw(screen)
-        player_group.draw(screen)
-        clock1.tick(60)
-        pygame.display.flip()
-    else:
-        for ev in pygame.event.get():
-            if ev.type == pygame.QUIT:
-                running = False
-            if ev.type == pygame.MOUSEBUTTONDOWN:
-                for sprite in all_sprites:
-                    sprite.kill()
-                isOvered = False
-                player, level_x, level_y, player2 = generate_level(level1)
-                gameover.rect.x = -1200
-        if gameover.rect.x < 0:
-            gameover.rect.x += 600 / 60
-        screen.fill((0, 0, 0))
-        all_sprites.draw(screen)
-        for ev in pygame.event.get():
-            if ev.type == pygame.QUIT:
-                running = False
-        player_group.draw(screen)
-        player.update(chg1=False, chg2=False)
-        player2.update(chg1=False, chg2=False)
-        gameover_group.draw(screen)
-        clock1.tick(60)
-        pygame.display.flip()
+        menu_sprites.draw(screen)
