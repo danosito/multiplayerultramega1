@@ -2,3 +2,7 @@ b-brick
 .-air
 p-portal
 u-keyhole
+i-ice
+k-key
+s-stair
+f-fire
