@@ -6,3 +6,4 @@ i-ice
 k-key
 s-stair
 f-fire
+h-hit brick
