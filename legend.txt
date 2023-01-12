@@ -11,3 +11,4 @@ o-barrier
 x-ice btn
 y-fire btn
 w-water
+d-dirt
