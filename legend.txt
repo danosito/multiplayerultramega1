@@ -7,3 +7,7 @@ k-key
 s-stair
 f-fire
 h-hit brick
+o-barrier
+x-ice btn
+y-fire btn
+w-water
