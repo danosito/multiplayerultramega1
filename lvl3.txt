@@ -10,5 +10,5 @@ bs......bbbb......pb
 bs...sbbbbbbbbbbbbbb
 bs...s.............b
 bs...s.............b
-bs...s.........y...b
+bs@..s.........y...b
 bbbbbbbbbbbbbbbbbbbb
