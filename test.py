@@ -1,4 +1,4 @@
 from PIL import Image
-t = Image.open("data/portal.png")
-t = t.resize((50, 100))
-t.save("data/portal.png")
+t = Image.open("data/fon.jpg")
+t = t.resize((1000, 700))
+t.save("data/fon.jpg")

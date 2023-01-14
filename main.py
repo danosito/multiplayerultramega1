@@ -31,7 +31,6 @@ wall_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 tile_images = {
     'wall': load_image('brick.png'),
-    'button': load_image('button.png'),
     "stairs": load_image("stair.png"),
     "key": load_image("key.png"),
     "ice": load_image("ice.png"),
@@ -41,7 +40,18 @@ tile_images = {
 }
 hydro_image = load_image('hydro.png')
 electro_image = load_image('electroman.png')
+pyro_image = load_image('fireman.png')
+cryo_image = load_image('krioman.png')
+anemo_image = load_image('anemoman.png')
+geo_image = load_image('geoman.png')
+dendro_image = load_image('geoman.png')
+perss = [hydro_image, pyro_image, cryo_image, anemo_image, geo_image, electro_image]
 stairs_group = pygame.sprite.Group()
+key_group = pygame.sprite.Group()
+ice_group = pygame.sprite.Group()
+fire_group = pygame.sprite.Group()
+keyhole_group = pygame.sprite.Group()
+portal_group = pygame.sprite.Group()
 isOvered = False
 tile_width = tile_height = 50
 
@@ -135,10 +145,9 @@ def urovgen():
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
-        if tile_type not in ["wall", "wall1"]:
+        if tile_type != "wall":
             self.pos_x = pos_x
             self.pos_y = pos_y
-            print(tile_type)
             self.image = tile_images[tile_type]
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
@@ -151,7 +160,7 @@ class Tile(pygame.sprite.Sprite):
             elif tile_type == "fire":
                 super().__init__(fire_group, tiles_group, all_sprites)
             elif tile_type == "keyhole":
-                super().__init__(keyhole_group, tiles_group, all_sprites)
+                super().__init__(keyhole_group, wall_group, tiles_group, all_sprites)
             elif tile_type == "portal":
                 super().__init__(portal_group, tiles_group, all_sprites)
         else:
@@ -256,8 +265,22 @@ class Player(pygame.sprite.Sprite):
         if chg2 != None:
             self.isRight = chg2
         if pygame.sprite.spritecollideany(self, key_group):
-            self.hasKey == True
-            pygame.sprite.spritecollideany(self, key_group).remove()
+            self.hasKey = True
+            pygame.sprite.spritecollideany(self, key_group).kill()
+        self.rect.y += 5
+        self.rect.x += 5
+        if pygame.sprite.spritecollideany(self, keyhole_group):
+            if self.hasKey:
+                pygame.sprite.spritecollideany(self, keyhole_group).kill()
+        self.rect.y -= 10
+        self.rect.x -= 10
+        if pygame.sprite.spritecollideany(self, keyhole_group):
+            if self.hasKey:
+                pygame.sprite.spritecollideany(self, keyhole_group).kill()
+        self.rect.y += 5
+        self.rect.x += 5
+        if pygame.sprite.spritecollideany(self, portal_group):
+            pass
 
 
 running = True
@@ -265,29 +288,41 @@ player2 = None
 level1 = load_level("lvl1.txt")
 menu_sprites = pygame.sprite.Group()
 strelka1 = pygame.sprite.Sprite()
-strelka1.image = load_image("gameover.png")
+strelka1.image = load_image("triangle1.png")
 strelka1.rect = strelka1.image.get_rect()
 menu_sprites.add(strelka1)
+strelka1.rect.x = 0
+strelka1.rect.y = 200
 strelka2 = pygame.sprite.Sprite()
-strelka2.image = load_image("gameover.png")
+strelka2.image = load_image("triangle.png")
 strelka2.rect = strelka2.image.get_rect()
 menu_sprites.add(strelka2)
+strelka2.rect.x = 200
+strelka2.rect.y = 200
 strelka3 = pygame.sprite.Sprite()
-strelka3.image = load_image("gameover.png")
+strelka3.image = load_image("triangle1.png")
 strelka3.rect = strelka3.image.get_rect()
 menu_sprites.add(strelka3)
+strelka3.rect.x = 300
+strelka3.rect.y = 200
 strelka4 = pygame.sprite.Sprite()
-strelka4.image = load_image("gameover.png")
+strelka4.image = load_image("triangle.png")
 strelka4.rect = strelka4.image.get_rect()
 menu_sprites.add(strelka4)
+strelka4.rect.x = 500
+strelka4.rect.y = 200
 strelka5 = pygame.sprite.Sprite()
-strelka5.image = load_image("gameover.png")
+strelka5.image = load_image("triangle1.png")
 strelka5.rect = strelka5.image.get_rect()
 menu_sprites.add(strelka5)
+strelka5.rect.x = 600
+strelka5.rect.y = 200
 strelka6 = pygame.sprite.Sprite()
-strelka6.image = load_image("gameover.png")
+strelka6.image = load_image("triangle.png")
 strelka6.rect = strelka6.image.get_rect()
 menu_sprites.add(strelka6)
+strelka6.rect.x = 800
+strelka6.rect.y = 200
 player, level_x, level_y, player2 = generate_level(level1, "hydro", "electro")
 gameover_group = pygame.sprite.Group()
 menu_group = pygame.sprite.Group()
@@ -298,14 +333,30 @@ gameover_group.add(gameover)
 gameover.rect.x = -20 * 50
 gameover.rect.y = 0
 clock1 = pygame.time.Clock()
-state = 1
-nowlevelsel = 1
-# изображение должно лежать в папке data
+state = 0
+g = open("data/lastlevel.txt")
+nowlevelsel = int(g.read()) + 1
+fon_group = pygame.sprite.Group()
+fon = pygame.sprite.Sprite()
+fon.image = load_image("fon.jpg")
+fon.rect = fon.image.get_rect()
+fon_group.add(fon)
+char1 = pygame.sprite.Sprite()
+char1.image = perss[0]
+char1.rect = char1.image.get_rect()
+menu_sprites.add(char1)
+char1.rect.x = 425
+char1.rect.y = 200
+char2 = pygame.sprite.Sprite()
+char2.image = perss[1]
+char2.rect = char2.image.get_rect()
+menu_sprites.add(char2)
+char2.rect.x = 725
+char2.rect.y = 200
 while running:
     if state == 1:
         if not(isOvered):
-            screen.fill((0, 0, 0))
-            # изменяем ракурс камеры
+            fon_group.draw(screen)
             for ev in pygame.event.get():
                 if ev.type == pygame.QUIT:
                     running = False
@@ -343,14 +394,11 @@ while running:
                         sprite.kill()
                     isOvered = False
                     player, level_x, level_y, player2 = generate_level(level1)
-                    gameover.rect.x = -1200
+                    gameover.rect.x = -1000
             if gameover.rect.x < 0:
-                gameover.rect.x += 600 / 60
-            screen.fill((0, 0, 0))
+                gameover.rect.x += 200 / 60
+            fon_group.draw(screen)
             all_sprites.draw(screen)
-            for ev in pygame.event.get():
-                if ev.type == pygame.QUIT:
-                    running = False
             player_group.draw(screen)
             player.update(chg1=False, chg2=False)
             player2.update(chg1=False, chg2=False)
@@ -358,9 +406,19 @@ while running:
             clock1.tick(60)
             pygame.display.flip()
     if state == 0:
-        g = open("data/lastlevel.txt")
         screen.fill((128, 128, 128))
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
                 running = False
+        menu_sprites.draw(screen)
+        font = pygame.font.Font(None, 100)
+        text_coord = 0
+        string_rendered = font.render(str(nowlevelsel), 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 0
+        intro_rect.top = text_coord
+        intro_rect.x = 125
+        intro_rect.y = 225
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
         pygame.display.flip()
