@@ -1,5 +1,5 @@
 bbbbbbbbbbbbbbbbbbbb
-b..................b
+b................b.b
 b........f.f.......b
 bs.......f.f.....upb
 bs.......f.f.......b
