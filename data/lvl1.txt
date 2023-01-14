@@ -7,8 +7,8 @@ bs..bbbbbbbbbbbbbbbb
 bs.....i...........b
 bs.....i...........b
 bs.....i...........b
-bbbbbbbbbbbb....bbbb
-b..........s.......b
-b..........s......kb
-b@.........s.......b
+bbbbbbbbbbbbs...bbbb
+b...........s......b
+b...........s.....kb
+b@*.........s......b
 bbbbbbbbbbbbbbbbbbbb

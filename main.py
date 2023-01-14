@@ -4,72 +4,32 @@ import random
 import pygame
 
 pygame.init()
-size = width, height = 1920, 1080
+size = width, height = 20 * 50, 14 * 50
 screen = pygame.display.set_mode(size)
 player = None
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
-snow_group = pygame.sprite.Group()
-gift_group = pygame.sprite.Group()
-savepoint_group = pygame.sprite.Group()
-button_group = pygame.sprite.Group()
-snegovik_group = pygame.sprite.Group()
-level1 = []
 
-def generate_level(level):
+def generate_level(level, sel1, sel2):
     new_player, x, y, new_player2 = None, None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
-            if level[y][x] == '.':
-                Tile('empty', x, y)
-            if level[y][x] == '#':
-                if y != 0:
-                    if level[y][x] == '#' and level[y - 1][x] == '#':
-                        Tile('wall', x, y)
-                    if level[y][x] == '#' and level[y - 1][x] != '#':
-                        Tile('wall1', x, y)
-                else:
-                    Tile('wall', x, y)
-            if level[y][x] == "s":
-                Tile('empty', x, y)
-                Tile("snowb", x, y)
-            if level[y][x] == "g":
-                Tile('empty', x, y)
-                Tile("giftb", x, y)
-            if level[y][x] == "q":
-                SP(x, y)
+            if level[y][x] == 'b':
+                Tile("wall", x, y)
             if level[y][x] == '@':
-                Tile('empty', x, y)
-                new_player = Player(x, y, "snow")
+                new_player = Player(x, y, sel1)
             if level[y][x] == '*':
-                Tile('empty', x, y)
-                new_player2 = Player(x, y, "gift")
-            if level[y][x] == '1':
-                Tile('empty', x, y)
-                Button(x, y, [(17, 66)])
-            if level[y][x] == '2':
-                Tile('empty', x, y)
-                Button(x, y, [(15, 63)])
-            if level[y][x] == '3':
-                Tile('empty', x, y)
-                listofline = [(13, 63), (12, 64), (11, 65)]
-                for i in range(66, 85):
-                    listofline.append((10, i))
-                Button(x, y, listofline)
-            if level[y][x] == '4':
-                Tile('empty', x, y)
-                Button(x, y, [(17, 104), (16, 103), (15, 102), (14, 101), (14, 100), (14, 99)])
-            if level[y][x] == '5':
-                Tile('empty', x, y)
-                listofline = [(13, 103), (12, 104), (11, 105), (10, 106)]
-                for i in range(107, 127):
-                    listofline.append((9, i))
-                Button(x, y, listofline)
-            if level[y][x] == '6':
-                Tile('empty', x, y)
-                Tile("snegovik", x, y)
+                new_player2 = Player(x, y, sel2)
+            if level[y][x] == 's':
+                Tile("stairs", x, y)
+            if level[y][x] == 'k':
+                Tile("key", x, y)
+            if level[y][x] == 'i':
+                Tile("ice", x, y)
+            if level[y][x] == 'f':
+                Tile("fire", x, y)
     return new_player, x, y, new_player2
 
 
@@ -153,17 +113,15 @@ def urovgen():
             map.write("\n")
 
 tile_images = {
-    'wall': load_image('box.png'),
-    'wall1': load_image('box1.png'),
-    'empty': load_image('grass.png'),
-    'empty1': load_image('grass.png'),
-    'snowb' : load_image('snowb.png'),
-    "giftb": load_image('giftplace.png'),
+    'wall': load_image('brick.png'),
     'button': load_image('button.png'),
-    'snegovik' : load_image('snegovik.png')
+    "stairs": load_image("stair.png"),
+    "key": load_image("key.png"),
+    "ice": load_image("ice.png"),
+    "fire": load_image("fire.png")
 }
 snow_image = load_image('snowball.png')
-gift_image = load_image('gift.png')
+gift_image = load_image('electroman.png')
 isOvered = False
 tile_width = tile_height = 50
 
@@ -173,17 +131,11 @@ class Tile(pygame.sprite.Sprite):
         if tile_type not in ["wall", "wall1"]:
             self.pos_x = pos_x
             self.pos_y = pos_y
-            if tile_type == "empty":
-                super().__init__(tiles_group, all_sprites)
-            if tile_type == "snowb":
-                super().__init__(snow_group, all_sprites)
-            if tile_type == "giftb":
-                super().__init__(gift_group, all_sprites)
-            if tile_type == "snegovik":
-                super().__init__(snegovik_group, all_sprites)
+            print(tile_type)
             self.image = tile_images[tile_type]
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
+            super().__init__(tiles_group, all_sprites)
         else:
             Wall(tile_type, pos_x, pos_y)
 
@@ -235,13 +187,7 @@ class Player(pygame.sprite.Sprite):
         if event.key == 97 or event.key == 1073741904:
             self.isLeft = True
         if event.key == 115 or event.key == 1073741905:
-            if pygame.sprite.spritecollideany(self, button_group) != None:
-                for i in pygame.sprite.spritecollideany(self, button_group).poses:
-                    print(i[0] + 10)
-                    n = list(level1[i[0] + 10])
-                    n[i[1]] = "#"
-                    level1[i[0] + 10] = "".join(n)
-                return level1
+            pass
         if event.key == 100 or event.key == 1073741903:
             self.isRight = True
 
@@ -287,28 +233,6 @@ class Player(pygame.sprite.Sprite):
             self.isLeft = chg1
         if chg2 != None:
             self.isRight = chg2
-        if pygame.sprite.spritecollideany(self, savepoint_group) != None:
-            for i in range(len(level1)):
-                if "@" in level1[i]:
-                    level1[i] = "".join(level1[i]).replace("@", ".")
-                if "*" in level1[i]:
-                    level1[i] = "".join(level1[i]).replace("*", ".")
-            n = list(level1[pygame.sprite.spritecollideany(self, savepoint_group).posts[1]])
-            n[pygame.sprite.spritecollideany(self, savepoint_group).posts[0]] = "@"
-            level1[pygame.sprite.spritecollideany(self, savepoint_group).posts[1]] = "".join(n)
-            n = list(level1[pygame.sprite.spritecollideany(self, savepoint_group).posts[1] - 1])
-            n[pygame.sprite.spritecollideany(self, savepoint_group).posts[0]] = "*"
-            level1[pygame.sprite.spritecollideany(self, savepoint_group).posts[1] - 1] = "".join(n)
-        if self.player_type == "gift":
-            if pygame.sprite.spritecollideany(self, snow_group):
-                return True
-            else:
-                return False
-        else:
-            if pygame.sprite.spritecollideany(self, gift_group):
-                return True
-            else:
-                return False
 
 
 class SP(pygame.sprite.Sprite):
@@ -335,27 +259,9 @@ class Button(pygame.sprite.Sprite):
             tile_width * pos_x, tile_height * pos_y)
 
 
-class Camera:
-    # зададим начальный сдвиг камеры
-    def __init__(self):
-        self.dx = 0
-        self.dy = 0
-
-    # сдвинуть объект obj на смещение камеры
-    def apply(self, obj):
-        obj.rect.x += self.dx
-        obj.rect.y += self.dy
-
-    # позиционировать камеру на объекте target
-    def update(self, target):
-        self.dx = -(target.rect.x + target.rect.w // 2 - width // 2)
-        self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
-
-
-
 running = True
 player2 = None
-level1 = load_level("map1.txt")
+level1 = load_level("lvl1.txt")
 menu_sprites = pygame.sprite.Group()
 strelka1 = pygame.sprite.Sprite()
 strelka1.image = load_image("gameover.png")
@@ -381,18 +287,17 @@ strelka6 = pygame.sprite.Sprite()
 strelka6.image = load_image("gameover.png")
 strelka6.rect = strelka6.image.get_rect()
 menu_sprites.add(strelka6)
-player, level_x, level_y, player2 = generate_level(level1)
-camera = Camera()
+player, level_x, level_y, player2 = generate_level(level1, "snow", "gift")
 gameover_group = pygame.sprite.Group()
 menu_group = pygame.sprite.Group()
 gameover = pygame.sprite.Sprite()
 gameover.image = load_image("gameover.png")
 gameover.rect = gameover.image.get_rect()
 gameover_group.add(gameover)
-gameover.rect.x = -1920
+gameover.rect.x = -20 * 50
 gameover.rect.y = 0
 clock1 = pygame.time.Clock()
-state = 0
+state = 1
 nowlevelsel = 1
 # изображение должно лежать в папке data
 while running:
@@ -424,10 +329,6 @@ while running:
             isOvered1 = player.update()
             isOvered2 = player2.update()
             isOvered = isOvered1 or isOvered2
-            camera.update(player)
-            # обновляем положение всех спрайтов
-            for sprite in all_sprites:
-                camera.apply(sprite)
             all_sprites.draw(screen)
             player_group.draw(screen)
             clock1.tick(60)
