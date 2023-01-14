@@ -1,4 +1,4 @@
-from PIl import Image
-t = Image.open("data/gameover.png")
-t = t.resize(1000, 700)
-t.save("data/gameover.png")
+from PIL import Image
+t = Image.open("data/portal.png")
+t = t.resize((50, 100))
+t.save("data/portal.png")
