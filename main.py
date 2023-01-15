@@ -224,6 +224,8 @@ def checker(self):
     if self.player_type == pyro_image:
         if pygame.sprite.spritecollideany(self, ice_group):
             pygame.sprite.spritecollideany(self, ice_group).kill()
+        if pygame.sprite.spritecollideany(self, water_group):
+            isOvered = True
     if self.player_type == geo_image:
         if pygame.sprite.spritecollideany(self, hit_brick_group):
             pygame.sprite.spritecollideany(self, hit_brick_group).kill()
@@ -406,7 +408,7 @@ class Player(pygame.sprite.Sprite):
 
 
 class Info():
-    def __init__(self, isSprite, playerNum, levelnum=None):
+    def __init__(self, isSprite, playerNum=None, levelnum=None):
         self.info_sprites = pygame.sprite.Group()
         if isSprite:
             char1 = pygame.sprite.Sprite()
@@ -427,6 +429,8 @@ class Info():
             self.info_sprites.add(strelka1)
             strelka1.rect.x = 0
             strelka1.rect.y = 0
+        else:
+            pass
 
 
 class Button(pygame.sprite.Sprite):
@@ -667,6 +671,7 @@ while running:
                 if ev.pos[1] in range(50, 150):
                     if ev.pos[0] in range(100, 200):
                         state = 2
+                        info = Info(False, levelnum=nowlevelsel)
                     if ev.pos[0] in range(400, 500):
                         state = 2
                         info = Info(True, chr12[0])
