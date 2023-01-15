@@ -28,6 +28,11 @@ player = None
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
+barrier_group = pygame.sprite.Group()
+water_group = pygame.sprite.Group()
+dirt_group = pygame.sprite.Group()
+ice_btn_group = pygame.sprite.Group()
+fire_btn_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 tile_images = {
     'wall': load_image('brick.png'),
@@ -36,7 +41,14 @@ tile_images = {
     "ice": load_image("ice.png"),
     "fire": load_image("fire.png"),
     "keyhole": load_image("keyhole.png"),
-    'portal': load_image("portal.png")
+    'portal': load_image("portal.png"),
+    "hit_brick": load_image("break_brick.png"),
+    "water": load_image("water.png"),
+    "fire_btn": load_image("fire_button.png"),
+    "ice_btn": load_image("ice_button.png"),
+    "barrier": load_image("barrier.png"),
+    "dirt": load_image("grass.png"),
+    "dendro": load_image("dendro-column.png")
 }
 hydro_image = load_image('hydro.png')
 electro_image = load_image('electroman.png')
@@ -52,10 +64,11 @@ cryo_info = load_image('crio_info.png')
 anemo_info = load_image('anemo_info.png')
 geo_info = load_image('geo_info.png')
 dendro_info = load_image('dendro_info.png')
-scaled = [load_image("hydro_scaled.png"), load_image("fireman_scaled.png"), load_image("crioman_scaled.png"), load_image("anemoman_scaled.png"), load_image("geoman_scaled.png"), load_image("electroman_scaled.png"), load_image("dendroman_scaled.png")]
-perss = [hydro_image, pyro_image, cryo_image, anemo_image, geo_image, electro_image, dendro_image]
-persi = [hydro_info, pyro_info, cryo_info, anemo_info, geo_info, electro_info, dendro_info]
+scaled = [load_image("hydro_scaled.png"), load_image("fireman_scaled.png"), load_image("geoman_scaled.png"), load_image("crioman_scaled.png"), load_image("dendroman_scaled.png"), load_image("electroman_scaled.png"), load_image("anemoman_scaled.png")]
+perss = [hydro_image, pyro_image, geo_image, cryo_image, dendro_image, electro_image, anemo_image]
+persi = [hydro_info, pyro_info, geo_info, cryo_info, dendro_info, electro_info, anemo_info]
 stairs_group = pygame.sprite.Group()
+hit_brick_group = pygame.sprite.Group()
 key_group = pygame.sprite.Group()
 ice_group = pygame.sprite.Group()
 fire_group = pygame.sprite.Group()
@@ -86,6 +99,20 @@ def generate_level(level, sel1, sel2):
                 Tile("keyhole", x, y)
             if level[y][x] == 'p':
                 Tile("portal", x, y)
+            if level[y][x] == 'h':
+                Tile("hit_brick", x, y)
+            if level[y][x] == 'h':
+                Tile("hit_brick", x, y)
+            if level[y][x] == 'o':
+                Tile("barrier", x, y)
+            if level[y][x] == 'x':
+                Button("ice_btn", x, y)
+            if level[y][x] == 'y':
+                Button("fire_btn", x, y)
+            if level[y][x] == "w":
+                Tile("water", x, y)
+            if level[y][x] == 'd':
+                Tile("dirt", x, y)
     return new_player, x, y, new_player2
 
 
@@ -107,21 +134,35 @@ def terminate():
     sys.exit()
 
 def start_screen():
-    intro_text = ["ЗАСТАВКА", "",
+    intro_text = ["ДОБРО ПОЖАЛОВАТЬ!:)", "",
                   "Правила игры",
-                  "Если в правилах несколько строк,",
-                  "приходится выводить их построчно"]
+                  "игра на двух игроков.",
+                  "Вначале выберите персонажа",
+                  "и уровень,",
+                  "они открываются последовательно.",
+                  "нажмите на кнопку i,",
+                  "чтобы посмотреть информацию",
+                  "о выбранном персонаже/уровне.",
+                  "управление для первого игрока:",
+                  "a-влево, d-вправо, w-прыжок",
+                  "s-специальное действие*.",
+                  "управление для второго игрока:",
+                  "←-влево, →-вправо, ↑-прыжок",
+                  "↓-специальное действие*.",
+                  "",
+                  "",
+                  "*специальные действия есть у некоторых персонажей. читайте их описание"]
 
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height  ))
+    fon = pygame.transform.scale(load_image('preview.png'), (width, height  ))
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
+    font = pygame.font.Font("ARIALUNI.TTF", 15)
+    text_coord = 15
     for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 10
+        intro_rect.x = 0
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
     while True:
@@ -152,6 +193,48 @@ def urovgen():
             map.write("\n")
 
 
+def checker(self):
+    global isOvered
+    if self.player_type == anemo_image:
+        if pygame.sprite.spritecollideany(self, ice_group):
+            isOvered = True
+        if pygame.sprite.spritecollideany(self, fire_group):
+            isOvered = True
+        if pygame.sprite.spritecollideany(self, water_group):
+            isOvered = True
+    if self.player_type == dendro_image:
+        if pygame.sprite.spritecollideany(self, fire_group):
+            isOvered = True
+    if self.player_type == electro_image:
+        if pygame.sprite.spritecollideany(self, fire_group) or pygame.sprite.spritecollideany(self, water_group):
+            isOvered = True
+    if self.player_type == hydro_image:
+        if pygame.sprite.spritecollideany(self, ice_group):
+            isOvered = True
+        if pygame.sprite.spritecollideany(self, fire_group):
+            pygame.sprite.spritecollideany(self, fire_group).kill()
+    if self.player_type == cryo_image:
+        if pygame.sprite.spritecollideany(self, water_group):
+            Tile("ice", pygame.sprite.spritecollideany(self, water_group).pos_x, pygame.sprite.spritecollideany(self, water_group).pos_y)
+            pygame.sprite.spritecollideany(self, water_group).kill()
+        if pygame.sprite.spritecollideany(self, fire_group):
+            isOvered = True
+        if pygame.sprite.spritecollideany(self, water_group):
+            isOvered = True
+    if self.player_type == pyro_image:
+        if pygame.sprite.spritecollideany(self, ice_group):
+            pygame.sprite.spritecollideany(self, ice_group).kill()
+    if self.player_type == geo_image:
+        if pygame.sprite.spritecollideany(self, hit_brick_group):
+            pygame.sprite.spritecollideany(self, hit_brick_group).kill()
+        if pygame.sprite.spritecollideany(self, water_group):
+            isOvered = True
+    if pygame.sprite.spritecollideany(self, keyhole_group):
+        if self.hasKey:
+            self.hasKey -= 1
+            pygame.sprite.spritecollideany(self, keyhole_group).kill()
+
+
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         if tile_type != "wall":
@@ -160,18 +243,26 @@ class Tile(pygame.sprite.Sprite):
             self.image = tile_images[tile_type]
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
-            if tile_type == "stairs":
+            if tile_type == "hit_brick":
+                super().__init__(hit_brick_group, wall_group, tiles_group, all_sprites)
+            if tile_type == "stairs" or tile_type == "dendro":
                 super().__init__(stairs_group, tiles_group, all_sprites)
             elif tile_type == "key":
                 super().__init__(key_group, tiles_group, all_sprites)
             elif tile_type == "ice":
-                super().__init__(ice_group, tiles_group, all_sprites)
+                super().__init__(ice_group, wall_group, tiles_group, all_sprites)
             elif tile_type == "fire":
                 super().__init__(fire_group, tiles_group, all_sprites)
             elif tile_type == "keyhole":
                 super().__init__(keyhole_group, wall_group, tiles_group, all_sprites)
             elif tile_type == "portal":
                 super().__init__(portal_group, tiles_group, all_sprites)
+            elif tile_type == "barrier":
+                super().__init__(barrier_group, wall_group, tiles_group, all_sprites)
+            elif tile_type == "water":
+                super().__init__(water_group, tiles_group, all_sprites)
+            elif tile_type == "dirt":
+                super().__init__(dirt_group, wall_group, tiles_group, all_sprites)
         else:
             Wall(tile_type, pos_x, pos_y)
 
@@ -188,7 +279,7 @@ class Wall(pygame.sprite.Sprite):
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, player_type):
-        self.hasKey = False
+        self.hasKey = 0
         self.pos_x = pos_x
         self.pos_y = pos_y
         super().__init__(player_group, all_sprites)
@@ -200,18 +291,18 @@ class Player(pygame.sprite.Sprite):
         self.isLeft = False
         self.isJumping = False
         self.jumpingForce = 0
+        self.isFinished = False
 
     def move(self, event):
         if event.key == 119 or event.key == 1073741906:
             if not(self.isJumping):
-                if self == player:
-                    wall_group.add(player2)
-                else:
-                    wall_group.add(player)
                 self.rect.y += 5
                 if pygame.sprite.spritecollideany(self, wall_group):
                     self.isJumping = True
-                    self.jumpingForce = 20
+                    if player.player_type == anemo_image or player2.player_type == anemo_image:
+                        self.jumpingForce = 30
+                    else:
+                        self.jumpingForce = 20
                 self.rect.y -= 5
                 if self == player:
                     wall_group.remove(player2)
@@ -220,7 +311,24 @@ class Player(pygame.sprite.Sprite):
         if event.key == 97 or event.key == 1073741904:
             self.isLeft = True
         if event.key == 115 or event.key == 1073741905:
-            pass
+            if self.player_type == dendro_image:
+                self.rect.y += 25
+                if pygame.sprite.spritecollideany(self, dirt_group):
+                    self.rect.y -= 25
+                    Tile("dendro", round(self.rect.x / 50), round(self.rect.y / 50) - 2)
+                else:
+                    self.rect.y -= 25
+            if self.player_type == electro_image:
+                self.rect.x += 5
+                self.rect.y += 5
+                if pygame.sprite.spritecollideany(self, keyhole_group):
+                    pygame.sprite.spritecollideany(self, keyhole_group).kill()
+                self.rect.x -= 10
+                self.rect.y -= 10
+                if pygame.sprite.spritecollideany(self, keyhole_group):
+                    pygame.sprite.spritecollideany(self, keyhole_group).kill()
+                self.rect.x += 5
+                self.rect.y += 5
         if event.key == 100 or event.key == 1073741903:
             self.isRight = True
 
@@ -233,21 +341,31 @@ class Player(pygame.sprite.Sprite):
             self.isRight = False
 
     def update(self, chg1=None, chg2=None):
-        if self == player:
-            wall_group.add(player2)
-        else:
-            wall_group.add(player)
         if self.isLeft:
-            self.rect.x -= 5
-            if pygame.sprite.spritecollideany(self, wall_group):
-                self.rect.x += 5
-        if self.isRight:
-            self.rect.x += 5
-            if pygame.sprite.spritecollideany(self, wall_group):
+            if player.player_type == anemo_image or player2.player_type == anemo_image:
+                self.rect.x -= 8
+            else:
                 self.rect.x -= 5
+            if pygame.sprite.spritecollideany(self, wall_group):
+                if player.player_type == anemo_image or player2.player_type == anemo_image:
+                    self.rect.x += 8
+                else:
+                    self.rect.x += 5
+        if self.isRight:
+            if player.player_type == anemo_image or player2.player_type == anemo_image:
+                self.rect.x += 8
+            else:
+                self.rect.x += 5
+            if pygame.sprite.spritecollideany(self, wall_group):
+                if player.player_type == anemo_image or player2.player_type == anemo_image:
+                    self.rect.x -= 8
+                else:
+                    self.rect.x -= 5
         if self.isJumping:
             if pygame.sprite.spritecollideany(self, stairs_group):
                 self.jumpingForce = 0
+                if pygame.sprite.spritecollideany(self, wall_group):
+                    self.rect.y += 10
                 self.rect.y -= 5
             else:
                 if self.jumpingForce != 0:
@@ -271,22 +389,20 @@ class Player(pygame.sprite.Sprite):
         if chg2 != None:
             self.isRight = chg2
         if pygame.sprite.spritecollideany(self, key_group):
-            self.hasKey = True
+            self.hasKey += 1
             pygame.sprite.spritecollideany(self, key_group).kill()
         self.rect.y += 5
         self.rect.x += 5
-        if pygame.sprite.spritecollideany(self, keyhole_group):
-            if self.hasKey:
-                pygame.sprite.spritecollideany(self, keyhole_group).kill()
+        checker(self)
         self.rect.y -= 10
         self.rect.x -= 10
-        if pygame.sprite.spritecollideany(self, keyhole_group):
-            if self.hasKey:
-                pygame.sprite.spritecollideany(self, keyhole_group).kill()
+        checker(self)
         self.rect.y += 5
         self.rect.x += 5
         if pygame.sprite.spritecollideany(self, portal_group):
-            pass
+            self.isFinished = True
+            pygame.sprite.spritecollideany(self, portal_group).kill()
+            self.kill()
 
 
 class Info():
@@ -313,7 +429,25 @@ class Info():
             strelka1.rect.y = 0
 
 
+class Button(pygame.sprite.Sprite):
+    def __init__(self, tile_type, pos_x, pos_y):
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        self.tile_type = tile_type
+        self.image = tile_images[tile_type]
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        if tile_type == "ice_btn":
+            super().__init__(ice_btn_group, tiles_group, all_sprites)
+        else:
+            super().__init__(fire_btn_group, tiles_group, all_sprites)
 
+    def updatee(self):
+        if pygame.sprite.spritecollideany(self, player_group):
+            if pygame.sprite.spritecollideany(self, player_group).player_type == cryo_image if self.tile_type == "ice_btn" else pyro_image:
+                return True
+        else:
+            return False
 
 
 running = True
@@ -415,7 +549,10 @@ char2.rect = char2.image.get_rect()
 menu_sprites.add(char2)
 char2.rect.x = 725
 char2.rect.y = 200
+g.close()
 chr12 = [0, 1]
+message = ""
+start_screen()
 while running:
     if state == 1:
         if not(isOvered):
@@ -425,25 +562,38 @@ while running:
                     running = False
                 if ev.type == pygame.KEYDOWN:
                     if ev.key in [97, 100, 119, 115]:
-                        g = player.move(ev)
-                        if g != None:
-                            for j in all_sprites:
-                                j.kill()
-                            player, level_x, level_y, player2 = generate_level(g)
+                        player.move(ev)
                     else:
-                        g = player2.move(ev)
-                        if g != None:
-                            for j in all_sprites:
-                                j.kill()
-                            player, level_x, level_y, player2 = generate_level(g)
+                        player2.move(ev)
                 if ev.type == pygame.KEYUP:
                     if ev.key in [97, 100, 119, 115]:
                         player.stopmove(ev)
                     else:
                         player2.stopmove(ev)
-            isOvered1 = player.update()
-            isOvered2 = player2.update()
-            isOvered = isOvered1 or isOvered2
+            if not player.isFinished:
+                player.update()
+            if not player2.isFinished:
+                player2.update()
+            if player.isFinished and player2.isFinished:
+                state = 0
+                g = open("data\lastlevel.txt", "w")
+                message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
+                g.write(str(nowlevelsel))
+                readed = nowlevelsel
+                g.close()
+                for sprite in all_sprites:
+                    sprite.kill()
+                player.kill()
+                player2.kill()
+            clck1, clck2 = False, False
+            for i in ice_btn_group:
+                clck1 = i.updatee()
+            print(fire_btn_group)
+            for i in fire_btn_group:
+                clck2 = i.updatee()
+            if clck2 and clck1:
+                for i in barrier_group:
+                    i.kill()
             all_sprites.draw(screen)
             player_group.draw(screen)
             clock1.tick(60)
@@ -456,7 +606,8 @@ while running:
                     for sprite in all_sprites:
                         sprite.kill()
                     isOvered = False
-                    player, level_x, level_y, player2 = generate_level(level1)
+                    state = 0
+                    message = ""
                     gameover.rect.x = -1000
             if gameover.rect.x < 0:
                 gameover.rect.x += 200 / 60
@@ -493,7 +644,6 @@ while running:
                     if ev.pos[0] in range(500, 600):
                         if chr12[0] < readed + 1:
                             chr12[0] += 1
-                            print(chr12[0])
                             char1.image = perss[chr12[0]]
                             if chr12[0] == chr12[1]:
                                 chr12[1] -= 1
@@ -526,8 +676,11 @@ while running:
                         info = Info(True, chr12[1])
         menu_sprites.draw(screen)
         font = pygame.font.Font(None, 100)
+        font2 = pygame.font.Font(None, 50)
         text_coord = 0
+        text_coord2 = 0
         string_rendered = font.render(str(nowlevelsel), 1, pygame.Color('white'))
+        string_rendered2 = font2.render(message, 1, pygame.Color('red'))
         intro_rect = string_rendered.get_rect()
         text_coord += 0
         intro_rect.top = text_coord
@@ -535,6 +688,13 @@ while running:
         intro_rect.y = 225
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+        intro_rect2 = string_rendered.get_rect()
+        text_coord2 += 0
+        intro_rect2.top = text_coord2
+        intro_rect2.x = 150
+        intro_rect2.y = 600
+        text_coord2 += intro_rect2.height
+        screen.blit(string_rendered2, intro_rect2)
         pygame.display.flip()
     if state == 2:
         screen.fill((128, 128, 128))
@@ -544,6 +704,7 @@ while running:
             if ev.type == pygame.MOUSEBUTTONDOWN:
                 if ev.pos[1] in range(0, 100) and ev.pos[0] in range(0, 100):
                     state = 0
+                    message = ""
 
         info.info_sprites.draw(screen)
         pygame.display.flip()
