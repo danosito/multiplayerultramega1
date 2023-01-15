@@ -1,4 +1,5 @@
 from PIL import Image
-t = Image.open("data/fon.jpg")
-t = t.resize((1000, 700))
-t.save("data/fon.jpg")
+name = "data/electro_info.png"
+t = Image.open(name)
+t = t.resize((666, 500))
+t.save(name)
