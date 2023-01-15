@@ -534,7 +534,7 @@ readed = int(g.read())
 nowlevelsel = readed + 1 if readed != 5 else readed
 fon_group = pygame.sprite.Group()
 fon = pygame.sprite.Sprite()
-fon.image = load_image("fon.jpg")
+fon.image = load_image("fon.png")
 fon.rect = fon.image.get_rect()
 fon_group.add(fon)
 char1 = pygame.sprite.Sprite()
@@ -588,7 +588,6 @@ while running:
             clck1, clck2 = False, False
             for i in ice_btn_group:
                 clck1 = i.updatee()
-            print(fire_btn_group)
             for i in fire_btn_group:
                 clck2 = i.updatee()
             if clck2 and clck1:
