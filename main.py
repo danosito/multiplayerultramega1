@@ -284,6 +284,7 @@ class Player(pygame.sprite.Sprite):
         self.hasKey = 0
         self.pos_x = pos_x
         self.pos_y = pos_y
+        self.anim_stage = 3
         super().__init__(player_group, all_sprites)
         self.image = player_type
         self.player_type = player_type
@@ -325,10 +326,12 @@ class Player(pygame.sprite.Sprite):
                 self.rect.y += 5
                 if pygame.sprite.spritecollideany(self, keyhole_group):
                     pygame.sprite.spritecollideany(self, keyhole_group).kill()
+                    self.anim_stage = 0
                 self.rect.x -= 10
                 self.rect.y -= 10
                 if pygame.sprite.spritecollideany(self, keyhole_group):
                     pygame.sprite.spritecollideany(self, keyhole_group).kill()
+                    self.anim_stage = 0
                 self.rect.x += 5
                 self.rect.y += 5
         if event.key == 100 or event.key == 1073741903:
@@ -342,7 +345,7 @@ class Player(pygame.sprite.Sprite):
         if event.key == 100 or event.key == 1073741903:
             self.isRight = False
 
-    def update(self, chg1=None, chg2=None):
+    def update(self, counter, chg1=None, chg2=None):
         if self.isLeft:
             if player.player_type == anemo_image or player2.player_type == anemo_image:
                 self.rect.x -= 8
@@ -405,6 +408,13 @@ class Player(pygame.sprite.Sprite):
             self.isFinished = True
             pygame.sprite.spritecollideany(self, portal_group).kill()
             self.kill()
+        if counter % 6 == 0:
+            if self.anim_stage < 3:
+                self.anim_stage += 1
+                self.image = load_image(f"electro animation/electro animation{str(self.anim_stage)}.png")
+            elif self.image != self.player_type:
+                self.image = self.player_type
+
 
 
 class Info():
@@ -479,6 +489,7 @@ level3 = load_level("lvl3.txt")
 level4 = load_level("lvl4.txt")
 level5 = load_level("lvl5.txt")
 levels = [level1, level2, level3, level4, level5]
+anim_stage = 3
 menu_sprites = pygame.sprite.Group()
 strelka1 = pygame.sprite.Sprite()
 strelka1.image = load_image("triangle1.png")
@@ -548,6 +559,7 @@ gameover.rect = gameover.image.get_rect()
 gameover_group.add(gameover)
 gameover.rect.x = -20 * 50
 gameover.rect.y = 0
+counter = 0
 clock1 = pygame.time.Clock()
 state = 0
 g = open("data/lastlevel.txt")
@@ -570,6 +582,11 @@ char2.rect = char2.image.get_rect()
 menu_sprites.add(char2)
 char2.rect.x = 725
 char2.rect.y = 200
+strelka4 = pygame.sprite.Sprite()
+strelka4.image = load_image("triangle1.png")
+strelka4.rect = strelka4.image.get_rect()
+strelka4.rect.x = 0
+strelka4.rect.y = 0
 g.close()
 chr12 = [0, 1]
 message = ""
@@ -591,10 +608,17 @@ while running:
                         player.stopmove(ev)
                     else:
                         player2.stopmove(ev)
+                if ev.type == pygame.MOUSEBUTTONDOWN:
+                    if ev.pos[0] in range(0, 100) and ev.pos[1] in range(0, 100):
+                        state = 0
+                        for sprite in all_sprites:
+                            sprite.kill()
+                        player.kill()
+                        player2.kill()
             if not player.isFinished:
-                player.update()
+                player.update(counter)
             if not player2.isFinished:
-                player2.update()
+                player2.update(counter)
             if player.isFinished and player2.isFinished:
                 state = 0
                 g = open("data\lastlevel.txt", "w")
@@ -619,6 +643,7 @@ while running:
             player_group.draw(screen)
             clock1.tick(60)
             pygame.display.flip()
+            counter += 1
         else:
             for ev in pygame.event.get():
                 if ev.type == pygame.QUIT:
@@ -635,8 +660,8 @@ while running:
             fon_group.draw(screen)
             all_sprites.draw(screen)
             player_group.draw(screen)
-            player.update(chg1=False, chg2=False)
-            player2.update(chg1=False, chg2=False)
+            player.update(0, chg1=False, chg2=False)
+            player2.update(0, chg1=False, chg2=False)
             gameover_group.draw(screen)
             clock1.tick(60)
             pygame.display.flip()
@@ -686,6 +711,7 @@ while running:
                 if ev.pos[1] in range(350, 450) and ev.pos[0] in range(350, 550):
                     state = 1
                     player, level_x, level_y, player2 = generate_level(levels[nowlevelsel - 1], perss[chr12[0]], perss[chr12[1]])
+                    all_sprites.add(strelka4)
                 if ev.pos[1] in range(50, 150):
                     if ev.pos[0] in range(100, 200):
                         state = 2
