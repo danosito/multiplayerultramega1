@@ -430,7 +430,18 @@ class Info():
             strelka1.rect.x = 0
             strelka1.rect.y = 0
         else:
-            pass
+            char1 = pygame.sprite.Sprite()
+            char1.image = load_image(f"level{str(levelnum)}sc.png")
+            char1.rect = char1.image.get_rect()
+            self.info_sprites.add(char1)
+            char1.rect.x = 50
+            char1.rect.y = 100
+            strelka1 = pygame.sprite.Sprite()
+            strelka1.image = load_image("triangle1.png")
+            strelka1.rect = strelka1.image.get_rect()
+            self.info_sprites.add(strelka1)
+            strelka1.rect.x = 0
+            strelka1.rect.y = 0
 
 
 class Button(pygame.sprite.Sprite):
@@ -582,8 +593,9 @@ while running:
                 state = 0
                 g = open("data\lastlevel.txt", "w")
                 message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
-                g.write(str(nowlevelsel))
-                readed = nowlevelsel
+                if nowlevelsel > readed:
+                    g.write(str(nowlevelsel))
+                    readed = nowlevelsel
                 g.close()
                 for sprite in all_sprites:
                     sprite.kill()
