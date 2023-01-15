@@ -541,5 +541,9 @@ while running:
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
                 running = False
+            if ev.type == pygame.MOUSEBUTTONDOWN:
+                if ev.pos[1] in range(0, 100) and ev.pos[0] in range(0, 100):
+                    state = 0
+
         info.info_sprites.draw(screen)
         pygame.display.flip()
