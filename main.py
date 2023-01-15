@@ -582,8 +582,9 @@ while running:
                 state = 0
                 g = open("data\lastlevel.txt", "w")
                 message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
-                g.write(str(nowlevelsel))
-                readed = nowlevelsel
+                if nowlevelsel > readed:
+                    g.write(str(nowlevelsel))
+                    readed = nowlevelsel
                 g.close()
                 for sprite in all_sprites:
                     sprite.kill()
