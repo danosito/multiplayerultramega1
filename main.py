@@ -1,10 +1,9 @@
 import os
 import sys
-import random
 import pygame
 
 
-def load_image(name, colorkey=None):
+def load_image(name, colorkey=None):  # функция для загрузки картинок
     fullname = os.path.join('data', name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
@@ -21,7 +20,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-pygame.init()
+pygame.init()  # задаю все переменные
 size = width, height = 20 * 50, 14 * 50
 screen = pygame.display.set_mode(size)
 player = None
@@ -77,7 +76,7 @@ portal_group = pygame.sprite.Group()
 isOvered = False
 tile_width = tile_height = 50
 
-def generate_level(level, sel1, sel2):
+def generate_level(level, sel1, sel2): # перевод уровней в объекты
     new_player, x, y, new_player2 = None, None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
@@ -116,7 +115,7 @@ def generate_level(level, sel1, sel2):
     return new_player, x, y, new_player2
 
 
-def load_level(filename):
+def load_level(filename):  # функция для открытия файла уровня
     filename = "data/" + filename
     # читаем уровень, убирая символы перевода строки
     with open(filename, 'r') as mapFile:
@@ -129,11 +128,11 @@ def load_level(filename):
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
 
-def terminate():
+def terminate(): # функция для завершения работы
     pygame.quit()
     sys.exit()
 
-def start_screen():
+def start_screen(): # функция для заставки
     intro_text = ["ДОБРО ПОЖАЛОВАТЬ!:)", "",
                   "Правила игры",
                   "игра на двух игроков.",
@@ -176,24 +175,7 @@ def start_screen():
         clock1.tick(60)
 
 
-def urovgen():
-    map = open(f"data\{input('название уровня')}.txt", "w")
-    s = int(input("количество ячеек"))
-    maplist = []
-    for i in range(s):
-        maplist.append([])
-        for j in range(s):
-            maplist[i].append(".")
-            if random.randint(1, 10) < 5:
-                maplist[i][j] = "#"
-    maplist[random.randint(0, s - 1)][random.randint(0, s - 1)] = "@"
-    for i in range(len(maplist)):
-        map.write("".join(maplist[i]))
-        if i != s - 1:
-            map.write("\n")
-
-
-def checker(self):
+def checker(self): # функция для проверки игрока на касание твердого блока
     global isOvered
     if self.player_type == anemo_image:
         if pygame.sprite.spritecollideany(self, ice_group):
@@ -237,7 +219,7 @@ def checker(self):
             pygame.sprite.spritecollideany(self, keyhole_group).kill()
 
 
-class Tile(pygame.sprite.Sprite):
+class Tile(pygame.sprite.Sprite):  # класс для управления всеми объектами кроме игрока
     def __init__(self, tile_type, pos_x, pos_y):
         if tile_type != "wall":
             self.pos_x = pos_x
@@ -269,17 +251,17 @@ class Tile(pygame.sprite.Sprite):
             Wall(tile_type, pos_x, pos_y)
 
 
-class Wall(pygame.sprite.Sprite):
+class Wall(pygame.sprite.Sprite):  # класс, похожий на Tile, но немного другой, для работы с твердыми объектами
     def __init__(self, tile_type, pos_x, pos_y):
         self.pos_x = pos_x
         self.pos_y = pos_y
         super().__init__(tiles_group, wall_group, all_sprites)
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y)
+            tile_width * pos_x, tile_height * pos_y)  #
 
 
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):  # класс для управления игроком
     def __init__(self, pos_x, pos_y, player_type):
         self.hasKey = 0
         self.pos_x = pos_x
@@ -319,6 +301,7 @@ class Player(pygame.sprite.Sprite):
                 if pygame.sprite.spritecollideany(self, dirt_group):
                     self.rect.y -= 25
                     Tile("dendro", round(self.rect.x / 50), round(self.rect.y / 50) - 2)
+                    self.anim_stage = 0
                 else:
                     self.rect.y -= 25
             if self.player_type == electro_image:
@@ -411,13 +394,13 @@ class Player(pygame.sprite.Sprite):
         if counter % 6 == 0:
             if self.anim_stage < 3:
                 self.anim_stage += 1
-                self.image = load_image(f"electro animation/electro animation{str(self.anim_stage)}.png")
+                self.image = load_image(f"{'electro' if self.player_type == electro_image else 'dendro'} animation/{'electro' if self.player_type == electro_image else 'dendro'} animation{str(self.anim_stage)}.png")
             elif self.image != self.player_type:
-                self.image = self.player_type
+                self.image = self.player_type #
 
 
 
-class Info():
+class Info():  # класс для открытия информации
     def __init__(self, isSprite, playerNum=None, levelnum=None):
         self.info_sprites = pygame.sprite.Group()
         if isSprite:
@@ -460,7 +443,7 @@ class Info():
             char2.rect.y = 100
 
 
-class Button(pygame.sprite.Sprite):
+class Button(pygame.sprite.Sprite): # класс для кнопок
     def __init__(self, tile_type, pos_x, pos_y):
         self.pos_x = pos_x
         self.pos_y = pos_y
@@ -481,7 +464,7 @@ class Button(pygame.sprite.Sprite):
             return False
 
 
-running = True
+running = True  # создание переменных для меню/работы программы
 player2 = None
 level1 = load_level("lvl1.txt")
 level2 = load_level("lvl2.txt")
@@ -587,12 +570,19 @@ strelka4.image = load_image("triangle1.png")
 strelka4.rect = strelka4.image.get_rect()
 strelka4.rect.x = 0
 strelka4.rect.y = 0
+finish_group = pygame.sprite.Group()
+finish_img = pygame.sprite.Sprite()
+finish_img.image = load_image("fon.jpg")
+finish_img.rect = finish_img.image.get_rect()
+finish_img.rect.x = 0
+finish_img.rect.y = 0
+finish_group.add(finish_img)
 g.close()
 chr12 = [0, 1]
 message = ""
 start_screen()
-while running:
-    if state == 1:
+while running:  # игровой цикл
+    if state == 1:  # если идет игра
         if not(isOvered):
             fon_group.draw(screen)
             for ev in pygame.event.get():
@@ -609,7 +599,7 @@ while running:
                     else:
                         player2.stopmove(ev)
                 if ev.type == pygame.MOUSEBUTTONDOWN:
-                    if ev.pos[0] in range(0, 100) and ev.pos[1] in range(0, 100):
+                    if ev.pos[0] in range(0, 100) and ev.pos[1] in range(0, 100):  # выход с уровня
                         state = 0
                         for sprite in all_sprites:
                             sprite.kill()
@@ -619,21 +609,37 @@ while running:
                 player.update(counter)
             if not player2.isFinished:
                 player2.update(counter)
-            if player.isFinished and player2.isFinished:
-                state = 0
-                g = open("data\lastlevel.txt", "w")
-                message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
-                if nowlevelsel > readed:
-                    print(nowlevelsel)
-                    g.write(str(nowlevelsel))
-                    readed = nowlevelsel
+            if player.isFinished and player2.isFinished:  # выход с уровня после завершения и запись в файл
+                if nowlevelsel != 5:
+                    state = 0
+                    g = open("data\lastlevel.txt", "w")
+                    message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
+                    if nowlevelsel > readed:
+                        print(nowlevelsel)
+                        g.write(str(nowlevelsel))
+                        readed = nowlevelsel
+                    else:
+                        g.write(str(readed))
+                    g.close()
+                    for sprite in all_sprites:
+                        sprite.kill()
+                    player.kill()
+                    player2.kill()
                 else:
-                    g.write(str(readed))
-                g.close()
-                for sprite in all_sprites:
-                    sprite.kill()
-                player.kill()
-                player2.kill()
+                    state = 3
+                    g = open("data\lastlevel.txt", "w")
+                    message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
+                    if nowlevelsel > readed:
+                        print(nowlevelsel)
+                        g.write(str(nowlevelsel))
+                        readed = nowlevelsel
+                    else:
+                        g.write(str(readed))
+                    g.close()
+                    for sprite in all_sprites:
+                        sprite.kill()
+                    player.kill()
+                    player2.kill()
             clck1, clck2 = False, False
             for i in ice_btn_group:
                 clck1 = i.updatee()
@@ -647,7 +653,7 @@ while running:
             clock1.tick(60)
             pygame.display.flip()
             counter += 1
-        else:
+        else:  # в случае пройгрыша
             for ev in pygame.event.get():
                 if ev.type == pygame.QUIT:
                     running = False
@@ -668,7 +674,7 @@ while running:
             gameover_group.draw(screen)
             clock1.tick(60)
             pygame.display.flip()
-    if state == 0:
+    if state == 0:  # меню
         screen.fill((128, 128, 128))
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
@@ -747,7 +753,7 @@ while running:
         text_coord2 += intro_rect2.height
         screen.blit(string_rendered2, intro_rect2)
         pygame.display.flip()
-    if state == 2:
+    if state == 2:  # информация
         screen.fill((128, 128, 128))
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
@@ -756,6 +762,13 @@ while running:
                 if ev.pos[1] in range(0, 100) and ev.pos[0] in range(0, 100):
                     state = 0
                     message = ""
-
         info.info_sprites.draw(screen)
+        pygame.display.flip()
+    if state == 3:
+        finish_group.draw(screen)
+        for ev in pygame.event.get():
+            if ev.type == pygame.QUIT:
+                running = False
+            if ev.type == pygame.MOUSEBUTTONDOWN:
+                state = 0
         pygame.display.flip()
