@@ -442,6 +442,12 @@ class Info():
             self.info_sprites.add(strelka1)
             strelka1.rect.x = 0
             strelka1.rect.y = 0
+            char2 = pygame.sprite.Sprite()
+            char2.image = load_image(f"level{str(levelnum)}info.png")
+            char2.rect = char2.image.get_rect()
+            self.info_sprites.add(char2)
+            char2.rect.x = 600
+            char2.rect.y = 100
 
 
 class Button(pygame.sprite.Sprite):
