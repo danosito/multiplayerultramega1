@@ -45,7 +45,16 @@ cryo_image = load_image('crioman.png')
 anemo_image = load_image('anemoman.png')
 geo_image = load_image('geoman.png')
 dendro_image = load_image('dendroman.png')
+hydro_info = load_image('hydro_info.png')
+electro_info = load_image('electro_info.png')
+pyro_info = load_image('piro_info.png')
+cryo_info = load_image('crio_info.png')
+anemo_info = load_image('anemo_info.png')
+geo_info = load_image('geo_info.png')
+dendro_info = load_image('dendro_info.png')
+scaled = [load_image("hydro_scaled.png"), load_image("fireman_scaled.png"), load_image("crioman_scaled.png"), load_image("anemoman_scaled.png"), load_image("geoman_scaled.png"), load_image("electroman_scaled.png"), load_image("dendroman_scaled.png")]
 perss = [hydro_image, pyro_image, cryo_image, anemo_image, geo_image, electro_image, dendro_image]
+persi = [hydro_info, pyro_info, cryo_info, anemo_info, geo_info, electro_info, dendro_info]
 stairs_group = pygame.sprite.Group()
 key_group = pygame.sprite.Group()
 ice_group = pygame.sprite.Group()
@@ -280,9 +289,41 @@ class Player(pygame.sprite.Sprite):
             pass
 
 
+class Info():
+    def __init__(self, isSprite, playerNum, levelnum=None):
+        self.info_sprites = pygame.sprite.Group()
+        if isSprite:
+            char1 = pygame.sprite.Sprite()
+            char1.image = scaled[playerNum]
+            char1.rect = char1.image.get_rect()
+            self.info_sprites.add(char1)
+            char1.rect.x = 100
+            char1.rect.y = 100
+            char2 = pygame.sprite.Sprite()
+            char2.image = persi[playerNum]
+            char2.rect = char2.image.get_rect()
+            self.info_sprites.add(char2)
+            char2.rect.x = 400
+            char2.rect.y = 50
+            strelka1 = pygame.sprite.Sprite()
+            strelka1.image = load_image("triangle1.png")
+            strelka1.rect = strelka1.image.get_rect()
+            self.info_sprites.add(strelka1)
+            strelka1.rect.x = 0
+            strelka1.rect.y = 0
+
+
+
+
+
 running = True
 player2 = None
 level1 = load_level("lvl1.txt")
+level2 = load_level("lvl2.txt")
+level3 = load_level("lvl3.txt")
+level4 = load_level("lvl4.txt")
+level5 = load_level("lvl5.txt")
+levels = [level1, level2, level3, level4, level5]
 menu_sprites = pygame.sprite.Group()
 strelka1 = pygame.sprite.Sprite()
 strelka1.image = load_image("triangle1.png")
@@ -320,6 +361,24 @@ strelka6.rect = strelka6.image.get_rect()
 menu_sprites.add(strelka6)
 strelka6.rect.x = 800
 strelka6.rect.y = 200
+info1 = pygame.sprite.Sprite()
+info1.image = load_image("info.png")
+info1.rect = info1.image.get_rect()
+menu_sprites.add(info1)
+info1.rect.x = 400
+info1.rect.y = 50
+info2 = pygame.sprite.Sprite()
+info2.image = load_image("info.png")
+info2.rect = info2.image.get_rect()
+menu_sprites.add(info2)
+info2.rect.x = 100
+info2.rect.y = 50
+info3 = pygame.sprite.Sprite()
+info3.image = load_image("info.png")
+info3.rect = info3.image.get_rect()
+menu_sprites.add(info3)
+info3.rect.x = 700
+info3.rect.y = 50
 start_button = pygame.sprite.Sprite()
 start_button.image = load_image("start.png")
 start_button.rect = start_button.image.get_rect()
@@ -338,7 +397,7 @@ clock1 = pygame.time.Clock()
 state = 0
 g = open("data/lastlevel.txt")
 readed = int(g.read())
-nowlevelsel = readed + 1
+nowlevelsel = readed + 1 if readed != 5 else readed
 fon_group = pygame.sprite.Group()
 fon = pygame.sprite.Sprite()
 fon.image = load_image("fon.jpg")
@@ -420,7 +479,9 @@ while running:
                         if nowlevelsel > 1:
                             nowlevelsel -= 1
                     if ev.pos[0] in range(200, 300):
-                        if nowlevelsel < readed + 1:
+                        if nowlevelsel < readed + 1 and readed != 5:
+                            nowlevelsel += 1
+                        elif readed == 5 and nowlevelsel < readed:
                             nowlevelsel += 1
                     if ev.pos[0] in range(300, 400):
                         if 0 < chr12[0]:
@@ -453,7 +514,16 @@ while running:
                                 char1.image = perss[chr12[0]]
                 if ev.pos[1] in range(350, 450) and ev.pos[0] in range(350, 550):
                     state = 1
-                    player, level_x, level_y, player2 = generate_level(level1, perss[chr12[0]], perss[chr12[1]])
+                    player, level_x, level_y, player2 = generate_level(levels[nowlevelsel - 1], perss[chr12[0]], perss[chr12[1]])
+                if ev.pos[1] in range(50, 150):
+                    if ev.pos[0] in range(100, 200):
+                        state = 2
+                    if ev.pos[0] in range(400, 500):
+                        state = 2
+                        info = Info(True, chr12[0])
+                    if ev.pos[0] in range(700, 800):
+                        state = 2
+                        info = Info(True, chr12[1])
         menu_sprites.draw(screen)
         font = pygame.font.Font(None, 100)
         text_coord = 0
@@ -465,4 +535,15 @@ while running:
         intro_rect.y = 225
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+        pygame.display.flip()
+    if state == 2:
+        screen.fill((128, 128, 128))
+        for ev in pygame.event.get():
+            if ev.type == pygame.QUIT:
+                running = False
+            if ev.type == pygame.MOUSEBUTTONDOWN:
+                if ev.pos[1] in range(0, 100) and ev.pos[0] in range(0, 100):
+                    state = 0
+
+        info.info_sprites.draw(screen)
         pygame.display.flip()
