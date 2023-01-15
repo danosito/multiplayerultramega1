@@ -5,10 +5,10 @@ bs.bwwb............b
 bs.bbbb............b
 bs.........bbbbbboob
 bs........bb.......b
-bs.......bbb......pb
-bs......bbbb......pb
+bs.......bbb.....ppb
+bs......bbbb.......b
 bs...sbbbbbbbbbbbbbb
 bs...s.............b
-bs...s.............b
-bs@..s.........y...b
+bs@*.s.............b
+bs...s.........y...b
 bbbbbbbbbbbbbbbbbbbb

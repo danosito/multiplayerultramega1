@@ -4,11 +4,11 @@ b..........f.......b
 b..........f......sb
 b...bbhhhbbbbbbbb.sb
 b...b......h....b.sb
-b...b......h...pb.sb
-bs..b......h...pb.sb
+b...b......h..ppb.sb
+bs..b......h....b.sb
 bs..bbbbbbbbbbbbb.sb
 bs................sb
 bs................sb
+bs@*..............sb
 bs................sb
-bs@...............sb
 bbbbbbbbbbbbbbbbbbbb
