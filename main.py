@@ -534,6 +534,12 @@ start_button.rect = start_button.image.get_rect()
 menu_sprites.add(start_button)
 start_button.rect.x = 350
 start_button.rect.y = 350
+kubok = pygame.sprite.Sprite()
+kubok.image = load_image("kubok.png")
+kubok.rect = kubok.image.get_rect()
+menu_sprites.add(kubok)
+kubok.rect.x = 900
+kubok.rect.y = 0
 gameover_group = pygame.sprite.Group()
 menu_group = pygame.sprite.Group()
 gameover = pygame.sprite.Sprite()
@@ -653,7 +659,7 @@ while running:  # игровой цикл
                 for i in range(0, 5):
                     summa += int(lines[i])
                 lines[5] = str(summa)
-                if int(lines2[5]) > summa or int(lines2[5]) < 0:
+                if (int(lines2[5]) > summa or int(lines2[5]) < 0) and summa > 0:
                     lines2[5] = str(summa)
                 with open("data/results.txt", "w") as f:
                     f.write("\n".join(lines))

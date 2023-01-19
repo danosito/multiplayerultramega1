@@ -1,8 +1,8 @@
 bbbbbbbbbbbbbbbbbbbb
 b...b..............b
 b...u..............b
-bpp.u..............b
-b...b..............b
+bpp.u......f.......b
+b...b......f.......b
 bbbbbbbbbbbbbbbb.bbb
 b..................b
 bk..k.........u....b
