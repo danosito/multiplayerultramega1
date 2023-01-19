@@ -534,6 +534,12 @@ start_button.rect = start_button.image.get_rect()
 menu_sprites.add(start_button)
 start_button.rect.x = 350
 start_button.rect.y = 350
+kubok = pygame.sprite.Sprite()
+kubok.image = load_image("kubok.png")
+kubok.rect = kubok.image.get_rect()
+menu_sprites.add(kubok)
+kubok.rect.x = 900
+kubok.rect.y = 0
 gameover_group = pygame.sprite.Group()
 menu_group = pygame.sprite.Group()
 gameover = pygame.sprite.Sprite()
@@ -613,9 +619,8 @@ while running:  # игровой цикл
                 if nowlevelsel != 5:
                     state = 0
                     g = open("data\lastlevel.txt", "w")
-                    message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
+                    lines = []
                     if nowlevelsel > readed:
-                        print(nowlevelsel)
                         g.write(str(nowlevelsel))
                         readed = nowlevelsel
                     else:
@@ -630,7 +635,6 @@ while running:  # игровой цикл
                     g = open("data\lastlevel.txt", "w")
                     message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
                     if nowlevelsel > readed:
-                        print(nowlevelsel)
                         g.write(str(nowlevelsel))
                         readed = nowlevelsel
                     else:
@@ -640,6 +644,28 @@ while running:  # игровой цикл
                         sprite.kill()
                     player.kill()
                     player2.kill()
+                with open("data/results.txt") as f:
+                    lines = f.readlines()
+                with open("data/bestresults.txt") as f:
+                    lines2 = f.readlines()
+                for i in range(len(lines)):
+                    lines[i] = lines[i].replace("\n", "")
+                for i in range(len(lines2)):
+                    lines2[i] = lines2[i].replace("\n", "")
+                lines[nowlevelsel - 1] = str(counter)
+                if int(lines2[nowlevelsel - 1]) > counter or int(lines2[nowlevelsel - 1]) < 0:
+                    lines2[nowlevelsel - 1] = str(counter)
+                summa = 0
+                for i in range(0, 5):
+                    summa += int(lines[i])
+                lines[5] = str(summa)
+                if (int(lines2[5]) > summa or int(lines2[5]) < 0) and summa > 0:
+                    lines2[5] = str(summa)
+                with open("data/results.txt", "w") as f:
+                    f.write("\n".join(lines))
+                with open("data/bestresults.txt", "w") as f:
+                    f.write("\n".join(lines2))
+                message = f"поздравляем с завершением {str(nowlevelsel)} уровня!"
             clck1, clck2 = False, False
             for i in ice_btn_group:
                 clck1 = i.updatee()
@@ -648,8 +674,18 @@ while running:  # игровой цикл
             if clck2 and clck1:
                 for i in barrier_group:
                     i.kill()
+            font = pygame.font.Font(None, 100)
+            text_coord = 0
+            string_rendered = font.render(f"{str(counter // 3600)}:{str(counter//60 % 60)}", 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 0
+            intro_rect.top = text_coord
+            intro_rect.x = 800
+            intro_rect.y = 0
+            text_coord += intro_rect.height
             all_sprites.draw(screen)
             player_group.draw(screen)
+            screen.blit(string_rendered, intro_rect)
             clock1.tick(60)
             pygame.display.flip()
             counter += 1
@@ -719,6 +755,7 @@ while running:  # игровой цикл
                                 char1.image = perss[chr12[0]]
                 if ev.pos[1] in range(350, 450) and ev.pos[0] in range(350, 550):
                     state = 1
+                    counter = 0
                     player, level_x, level_y, player2 = generate_level(levels[nowlevelsel - 1], perss[chr12[0]], perss[chr12[1]])
                     all_sprites.add(strelka4)
                 if ev.pos[1] in range(50, 150):
@@ -731,6 +768,8 @@ while running:  # игровой цикл
                     if ev.pos[0] in range(700, 800):
                         state = 2
                         info = Info(True, chr12[1])
+                if ev.pos[0] in range(900, 1000) and ev.pos[1] in range(0, 100):
+                    state = 4
         menu_sprites.draw(screen)
         font = pygame.font.Font(None, 100)
         font2 = pygame.font.Font(None, 50)
@@ -771,4 +810,68 @@ while running:  # игровой цикл
                 running = False
             if ev.type == pygame.MOUSEBUTTONDOWN:
                 state = 0
+        pygame.display.flip()
+    if state == 4:
+        screen.fill((128, 128, 128))
+        for ev in pygame.event.get():
+            if ev.type == pygame.QUIT:
+                running = False
+            if ev.type == pygame.MOUSEBUTTONDOWN:
+                state = 0
+                message = ''
+        font = pygame.font.Font(None, 50)
+        text_coord = 0
+        with open("data/results.txt") as f:
+            lines = f.readlines()
+        with open("data/bestresults.txt") as f:
+            lines2 = f.readlines()
+        for i in range(len(lines)):
+            lines[i] = lines[i].replace("\n", "")
+            if int(lines[i]) < 0:
+                lines[i] = "--"
+        for i in range(len(lines2)):
+            lines2[i] = lines2[i].replace("\n", "")
+            if int(lines2[i]) < 0:
+                lines2[i] = "--"
+        text_coord = 15
+        lines.insert(0, "ваше:")
+        text1 = ["время прохождения:", "уровень 1", "уровень 2", "уровень 3", "уровень 4", "уровень 5", "всего"]
+        for line in text1:
+            string_rendered = font.render(line, 1,
+                                              pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 0
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+        text_coord = 15
+        for line in lines:
+            if line != "--" and line != "ваше:":
+                string_rendered = font.render(f"{str(int(line) // 3600)}:{str(int(line)//60 % 60)}", 1, pygame.Color('white'))
+            else:
+                string_rendered = font.render(line, 1,
+                                              pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 400
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+        text_coord = 15
+        lines2.insert(0, "лучшее:")
+        for line in lines2:
+            if line != "--" and line != "лучшее:":
+                string_rendered = font.render(f"{str(int(line) // 3600)}:{str(int(line) // 60 % 60)}", 1,
+                                              pygame.Color('white'))
+            else:
+                string_rendered = font.render(line, 1,
+                                              pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 700
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+        screen.blit(string_rendered, intro_rect)
         pygame.display.flip()
