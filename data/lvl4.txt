@@ -2,7 +2,7 @@ bbbbbbbbbbbbbbbbbbbb
 b...b..............b
 b...u..............b
 bpp.u......f.......b
-b...b......f.......b
+b...b..............b
 bbbbbbbbbbbbbbbb.bbb
 b..................b
 bk..k.........u....b
